@@ -1,5 +1,7 @@
 
-#This script will download a data set on Causes of Death in the United States. It will connect to PostgreSQL and load the data into a table. It will prompt a user to input a year and a state. It will then perform an SQL query using a where statement to find causes of death for the given year and state.
+#This script will download a data set on Causes of Death in the United States. It will connect 
+#to PostgreSQL and load the data into a table. It will prompt a user to input a year and a state. 
+#It will then perform an SQL query using a where statement to find causes of death for the given year and state.
 
 #download the data set from the website - Change download address as needed
 #link to data: https://data.cdc.gov/api/views/bi63-dtpu/rows.csv?accessType=DOWNLOAD	
