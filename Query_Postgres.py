@@ -11,22 +11,27 @@ import psycopg2
 from psycopg2.extensions import AsIs
 import wget
 import csv
-
-def get_data():
-
-    print('Downloading data on leading causes of death in the USA')
-    url = 'https://data.cdc.gov/api/views/bi63-dtpu/rows.csv?accessType=DOWNLOAD'
-    wget.download(url, '/home/monte/Documents/Python Scripts/data.csv')
-    
-get_data()    
+import os
+import os.path
 
 #set Python working directory to folder with download
 
 def setwd():
-    import os
+    
     os.chdir('/home/monte/Documents/Python Scripts/')
     
-setwd()    
+setwd() 
+
+def get_data():
+    if os.path.isfile('/home/monte/Documents/Python Scripts/data.csv'):
+        print ('Data file exists and is readable')
+    
+    else:
+        print('Downloading Data on Leading Causes of Death in the USA')
+        url = 'https://data.cdc.gov/api/views/bi63-dtpu/rows.csv?accessType=DOWNLOAD'
+        wget.download(url, '/home/monte/Documents/Python Scripts/data.csv')
+    
+get_data()   
 
 #clean data column that gives syntax errors
 #install pandas package: pip3 install pandas
@@ -50,14 +55,19 @@ def import_data():
     conn = psycopg2.connect(host="localhost", database="postgres", user="postgres", password="postgres")
     cur=conn.cursor()
     
-    cur.execute("""CREATE TABLE Cause_of_Death(ID integer, Year integer, "Cause Name" text, 
-    State text, Deaths numeric, "Age-adjusted Death Rate" numeric)""")
-    conn.commit()
-
-    with open('cause_death.csv', 'r') as f:
-        next(f)
-        cur.copy_from(f, 'Cause_of_Death', sep = ',')
+    try:
+        cur.execute("""CREATE TABLE Cause_of_Death(ID integer, Year integer, "Cause Name" text, 
+        State text, Deaths numeric, "Age-adjusted Death Rate" numeric)""")
         conn.commit()
+        
+        with open('cause_death.csv', 'r') as f:
+            next(f)
+            cur.copy_from(f, 'Cause_of_Death', sep = ',')
+            conn.commit()
+        
+        
+    except psycopg2.errors.DuplicateTable:
+        pass
 
 import_data()
 
