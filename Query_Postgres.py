@@ -1,7 +1,5 @@
 
-#This script will download a data set on Causes of Death in the United States. It will connect to PostgreSQL and load
-#the data into a table. It will prompt a user to input a year and a state. 
-#It will then perform an SQL query using a where statement to find causes of death for the given year and state.
+#This script will download a data set on Causes of Death in the United States. It will connect to PostgreSQL and load the data into a table. It will prompt a user to input a year and a state. It will then perform an SQL query using a where statement to find causes of death for the given year and state.
 
 #download the data set from the website - Change download address as needed
 #link to data: https://data.cdc.gov/api/views/bi63-dtpu/rows.csv?accessType=DOWNLOAD	
@@ -11,22 +9,27 @@ import psycopg2
 from psycopg2.extensions import AsIs
 import wget
 import csv
-
-def get_data():
-
-    print('Downloading data on leading causes of death in the USA')
-    url = 'https://data.cdc.gov/api/views/bi63-dtpu/rows.csv?accessType=DOWNLOAD'
-    wget.download(url, '/home/monte/Documents/Python Scripts/data.csv')
-    
-get_data()    
+import os
+import os.path
 
 #set Python working directory to folder with download
 
 def setwd():
-    import os
+    
     os.chdir('/home/monte/Documents/Python Scripts/')
     
-setwd()    
+setwd() 
+
+def get_data():
+    if os.path.isfile('/home/monte/Documents/Python Scripts/data.csv'):
+        print ('Data file exists and is readable')
+    
+    else:
+        print('Downloading Data on Leading Causes of Death in the USA')
+        url = 'https://data.cdc.gov/api/views/bi63-dtpu/rows.csv?accessType=DOWNLOAD'
+        wget.download(url, '/home/monte/Documents/Python Scripts/data.csv')
+    
+get_data()    
 
 #clean data column that gives syntax errors
 #install pandas package: pip3 install pandas
@@ -50,14 +53,19 @@ def import_data():
     conn = psycopg2.connect(host="localhost", database="postgres", user="postgres", password="postgres")
     cur=conn.cursor()
     
-    cur.execute("""CREATE TABLE Cause_of_Death(ID integer, Year integer, "Cause Name" text, 
-    State text, Deaths numeric, "Age-adjusted Death Rate" numeric)""")
-    conn.commit()
-
-    with open('cause_death.csv', 'r') as f:
-        next(f)
-        cur.copy_from(f, 'Cause_of_Death', sep = ',')
+    try:
+        cur.execute("""CREATE TABLE Cause_of_Death(ID integer, Year integer, "Cause Name" text, 
+        State text, Deaths numeric, "Age-adjusted Death Rate" numeric)""")
         conn.commit()
+        
+        with open('cause_death.csv', 'r') as f:
+            next(f)
+            cur.copy_from(f, 'Cause_of_Death', sep = ',')
+            conn.commit()
+        
+        
+    except psycopg2.errors.DuplicateTable:
+        pass
 
 import_data()
 
@@ -79,7 +87,3 @@ def query_table(query1, query2):
 	conn.commit()
 
 query_table(query1, query2)
-
-
-
-
