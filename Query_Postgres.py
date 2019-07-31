@@ -4,8 +4,14 @@
 #It will then perform an SQL query using a where statement to find causes of death for the given year and state.
 
 #download the data set from the website - Change download address as needed
-#link to data: https://data.cdc.gov/api/views/bi63-dtpu/rows.csv?accessType=DOWNLOAD	
+#link to data: https://data.cdc.gov/api/views/bi63-dtpu/rows.csv?accessType=DOWNLOAD
+#You will need the following packages:
 	#pip3 install wget
+	#install pandas package: pip3 install pandas
+	# C Compiler: sudo apt install build-essential
+	# Python header: sudo apt install python-dev
+	# Libpq package: sudo apt install libpq-dev
+	# Psycopg2: pip3 install psycopg2
 
 import psycopg2
 from psycopg2.extensions import AsIs
@@ -34,7 +40,6 @@ def get_data():
 get_data()    
 
 #clean data column that gives syntax errors
-#install pandas package: pip3 install pandas
 
 def clean_data():
     import pandas as pd
@@ -45,11 +50,6 @@ def clean_data():
 clean_data()    
 
 #connect to PostgreSQL server, create a table and import the data
-# install packages: 
-# C Compiler: sudo apt install build-essential
-# Python header: sudo apt install python-dev
-# Libpq package: sudo apt install libpq-dev
-# Psycopg2: pip3 install psycopg2
 
 def import_data():
     conn = psycopg2.connect(host="localhost", database="postgres", user="postgres", password="postgres")
@@ -74,7 +74,7 @@ import_data()
 #get input from user
 
 
-query1 = int(input('please enter a year: '))
+query1 = int(input('please enter a year from 1999 to 2016: '))
 query2 = str(input('please enter a state with the first letter capitalized: '))
 
 #query table with user input, print results
